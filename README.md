@@ -46,7 +46,7 @@ For this project, I cloned the repository to `$HOME` and the rest assumes that y
 
 ```sh
 % cd ~ && git clone git@github.com:AlexeyAB/darknet.git %% cd darknet
-# Replace the `Makefile` with `yolo/Makefile` in this repository
+# Replace the `Makefile` with `darknet/Makefile` in this repository
 % make
 ```
 
@@ -81,7 +81,7 @@ The labeled dataset used for training my final model contains 294 images, which 
 
 To train the model of a single object classifier with fast inferencing, I trained a 24-layer model based on pre-trained weights for the convolutional layers from [darknet53](https://pjreddie.com/darknet/imagenet/#darknet53) (http://pjreddie.com/media/files/darknet53.conv.74).
 
-The configuration of the model is defined in `yolo/yolov3-artefact.cfg` in this repository. [This thread](https://stackoverflow.com/questions/50390836/understanding-darknets-yolo-cfg-config-files) from stackoverflow was helpful to understand each parameter.
+The configuration of the model is defined in `darknet/yolov3-artefact.cfg` in this repository. [This thread](https://stackoverflow.com/questions/50390836/understanding-darknets-yolo-cfg-config-files) from stackoverflow was helpful to understand each parameter.
 
 The below is the visualization of the resulting model using [Netron](https://github.com/lutzroeder/netron). In order to generate this graph, I converted the weights file into `.pb` format by `import_pb_to_tensorboard.py` from TensorFlow (https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/tools/import_pb_to_tensorboard.py). The actual `.pb` file can be found at https://github.com/iomz/gserm19-adl/releases/download/v1/frozen_yolov3-artefact.pb.
 
@@ -93,7 +93,7 @@ As defined in the model configuration file from the previous step, I have traine
 
 ![Average loss over iterations](https://i.imgur.com/cCqRsNm.png)
 
-The final trained model can be found at: https://github.com/iomz/gserm19-adl/releases/download/v1/yolov3-artefact_final.weights
+The final trained model is `darknet/yolov3-artefact_final.weights` in this repository.
 
 ## 5. Evaluate
 
