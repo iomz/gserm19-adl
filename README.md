@@ -1,7 +1,7 @@
 # GSERM St.Gallen 2019 - Applied Deep Learning in Python
 
 This repository is a partial fulfillment for the completion of GSERM St.Gallen 2019 "Applied Deep Learning in Python" course.
-The reflection paper can be found [here](http://placeholder).
+The reflection paper can be found [here](https://github.com/iomz/gserm19-adl/releases/download/v1/GSERM_19_Applied_Deep_Learning_in_Python.pdf).
 
 ## Overview
 
@@ -23,11 +23,13 @@ To fully reproduce the results from this project, you need a local environment. 
 
 ## 1. Get your data
 
-
+https://github.com/iomz/gserm19-adl/releases/download/v1/artefact-recording.mp4
 
 ## 2. Prepare your data
 
 ![Yolo Mark](https://i.imgur.com/eFrxA4W.png)
+
+https://github.com/iomz/gserm19-adl/releases/download/v1/artefact-training-data.tgz
 
 ## 3. Define and build the model
 
@@ -36,6 +38,9 @@ To fully reproduce the results from this project, you need a local environment. 
 ## 4. Train
 
 ![Average loss over iterations](https://i.imgur.com/cCqRsNm.png)
+
+https://github.com/iomz/gserm19-adl/releases/download/v1/yolov3-artefact_final.weights
+https://github.com/iomz/gserm19-adl/releases/download/v1/frozen_yolov3-artefact.pb
 
 ## 5. Evaluate
 
