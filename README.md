@@ -3,6 +3,8 @@
 This repository is a partial fulfillment ('Practical Work') for the completion of GSERM St.Gallen 2019 "Applied Deep Learning in Python" course.
 The reflection paper can be found [here](https://github.com/iomz/gserm19-adl/releases/download/v1/GSERM_19_Applied_Deep_Learning_in_Python.pdf).
 
+# Object Detection and Localization with Darknet and Stereo Camera
+
 ## Overview
 
 `Explain your data, problem, and what you want to predict (also unsupervised problem is possible)`
@@ -13,15 +15,15 @@ This application assumed that the spatial coordinates of "artefacts" (in this pr
 
 ![UI for the FDD application](https://i.imgur.com/dxt51w4.png)
 
-I was inspired by [YOLOv3](https://github.com/AlexeyAB/darknet) introduced during the course and decided to implement the missing component by combining YOLO with the ZED stereo camera to translate the inferred object bounding box's coordinates for my Mixed Reality application to achieve a more realistically aligned methodology.
+I was inspired by [YOLOv3](https://github.com/AlexeyAB/darknet) introduced during the course and decided to implement the missing component by combining darknet with the ZED stereo camera to translate the inferred object bounding box's coordinates for my Mixed Reality application to achieve a more realistically aligned methodology.
 
 `Define approach: Why did you choose this model? Does the model fit your problem?`
 
-Besides YOLO, there are other alternatives to implement such classifiers: Google's [Cloud AutoML](https://cloud.google.com/automl/), [SSD in TensorFlow](https://github.com/balancap/SSD-Tensorflow), etc. I chose YOLO simply because ZED's SDK is compatible with YOLOv3 and I found a useful sample script from Stereolabs to start from.
+Besides Darknet, there are other alternatives to implement such classifiers: Google's [Cloud AutoML](https://cloud.google.com/automl/), [SSD in TensorFlow](https://github.com/balancap/SSD-Tensorflow), etc. I chose Darknet/YOLO simply because ZED's SDK is compatible with YOLOv3 and I found a useful [sample script](https://github.com/stereolabs/zed-yolo/tree/master/zed_python_sample) from Stereolabs to start from.
 
 ## 0. Setup
 
-To fully reproduce the results from this project, you need a local environment. This sections explains how to setup a development environment on [NVIDIA Jetson AGX Xavier Developer Kit](https://developer.nvidia.com/embedded/jetson-agx-xavier-developer-kit).
+To fully reproduce the results from this project, you need a local environment. This section explains how to setup a development environment on [NVIDIA Jetson AGX Xavier Developer Kit](https://developer.nvidia.com/embedded/jetson-agx-xavier-developer-kit).
 
 ### Install JetPack 4.2 on AGX Xavier
 The official documentation is [here](https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html).
@@ -33,14 +35,14 @@ To flush JetPack OS Image, you need a linux host machine. In my case, I didn't h
 ### Install ZED SDK v2.8.3
 The official documentation is [here](https://www.stereolabs.com/docs/getting-started/installation/).
 
-Fortunately, ZED SDK v2.8.3 is officially supported with JetPack 4.2, so download the installation script from [here](https://www.stereolabs.com/developers/release/#sdkdownloads_anchor<Paste>) and simply run it. To verify the installation, try one of the tools came with the SDK. The below is a screenshot from 'ZED Depth Viewer' which can be found in `/usr/local/zed/tools`.
+Fortunately, JetPack 4.2 is officially supported with ZED SDK v2.8.3, so simply download and run the installation script from [here](https://www.stereolabs.com/developers/release/#sdkdownloads_anchor). To verify the installation, try one of the tools came with the SDK. The below is a screenshot from 'ZED Depth Viewer' which can be found in `/usr/local/zed/tools`.
 
 ![Depth Viewer](https://i.imgur.com/qBPtVvm.png)
 
 ### Build Darknet YOLOv3
 The original repository is https://github.com/AlexeyAB/darknet#requirements . Install the required packages and compile from the source.
 
-For this project, I cloned the repository to $HOME and the rest assumes that you have `darknet` directory in your $HOME also.
+For this project, I cloned the repository to `$HOME` and the rest assumes that you have `darknet` directory there.
 
 ```sh
 % cd ~ && git clone git@github.com:AlexeyAB/darknet.git %% cd darknet
@@ -56,9 +58,9 @@ The original video used for training my final model can be found at: https://git
 
 ## 2. Prepare your data
 
-I used [Yolo_mark]{https://github.com/AlexeyAB/Yolo_mark} to divide the video into frames and label each image.
+I used [Yolo_mark](https://github.com/AlexeyAB/Yolo_mark) to divide the video into frames and label each image.
 
-After installing `Yolo_mark`, extract frames from the video files.
+After installing `Yolo_mark`, extract frames from the video file.
 
 ```sh
 % ./yolo_mark ~/artefact-data/img cap_video ~/artefact-recording.mp4 4
@@ -73,11 +75,11 @@ Then, manually label each image.
 The below is a screenshot from Yolo_mark running on Xavier labeling the dataset.
 ![Yolo Mark](https://i.imgur.com/eFrxA4W.png)
 
-The labeled dataset used for training my final model contains 294 imagens and it can be found at: https://github.com/iomz/gserm19-adl/releases/download/v1/artefact-training-data.tgz
+The labeled dataset used for training my final model contains 294 images, which can be found at: https://github.com/iomz/gserm19-adl/releases/download/v1/artefact-training-data.tgz
 
 ## 3. Define and build the model
 
-To train the model for single object classifier with fast inferencing object detection, I trained a 24-layer model based on pre-trained weights for the convolutional layers from [darknet53](https://pjreddie.com/darknet/imagenet/#darknet53) (http://pjreddie.com/media/files/darknet53.conv.74).
+To train the model of a single object classifier with fast inferencing, I trained a 24-layer model based on pre-trained weights for the convolutional layers from [darknet53](https://pjreddie.com/darknet/imagenet/#darknet53) (http://pjreddie.com/media/files/darknet53.conv.74).
 
 The configuration of the model is defined in `yolo/yolov3-artefact.cfg` in this repository. [This thread](https://stackoverflow.com/questions/50390836/understanding-darknets-yolo-cfg-config-files) from stackoverflow was helpful to understand each parameter.
 
@@ -87,7 +89,7 @@ The below is the visualization of the resulting model using [Netron](https://git
 
 ## 4. Train
 
-As defined in the model configuration, I have trained the model for 35020 iterations with adjusting the learning rate after 15000 and 29000 batches. The below is the plot of the average loss throughout the iterations.
+As defined in the model configuration file from the previous step, I have trained the model for 35020 iterations with the learning rate adjustment after 15000 and 29000 batches. The below is the plot of the average loss throughout the iterations.
 
 ![Average loss over iterations](https://i.imgur.com/cCqRsNm.png)
 
@@ -97,7 +99,7 @@ The final trained model can be found at: https://github.com/iomz/gserm19-adl/rel
 
 `Evaluate the outcome: Make sure to cover overfitting. Did it learn the problem? Did it generalize?`
 
-I tested the trained model to detect the artefact in the video streaming from both a webcam and ZED stereo camera.
+I tested the trained model to detect the artefact in the video streaming both from a webcam and from ZED stereo camera.
 
 To test with a live-feed from a webcam (running at http://localhost:8081)
 
@@ -105,12 +107,16 @@ To test with a live-feed from a webcam (running at http://localhost:8081)
 % ./darknet detector demo artefact-data/obj.data yolov3-artefact.cfg backup/yolov3-artefact_final.weights http://localhost:8081 -i 0 -thresh 0.3
 ```
 
+![webcam](https://i.imgur.com/Q0Nz8G5.png)
+
 To test with ZED, run the script `darknet_zed.sh` in this repository. The following snippet is from a successful running:
+
+![ZED](https://i.imgur.com/fMgIiFf.png)
 
 ```sh
 xavier:~/darknet % LD_LIBRARY_PATH=./:/usr/local/cuda/lib64 ./uselib artefact-data/obj.names yolov3-artefact.cfg backup/yolov3-artefact_final.weights zed_camera
 
- Used GPU 0 
+ Used GPU 0
    layer   filters  size/strd(dil)      input                output
    0 conv     16       3 x 3/ 1    416 x 416 x   3 ->  416 x 416 x  16 0.150 BF
    1 max               2 x 2/ 2    416 x 416 x  16 ->  208 x 208 x  16 0.003 BF
@@ -138,28 +144,50 @@ xavier:~/darknet % LD_LIBRARY_PATH=./:/usr/local/cuda/lib64 ./uselib artefact-da
   22 conv     18       1 x 1/ 1     26 x  26 x 256 ->   26 x  26 x  18 0.006 BF
   23 yolo
 [yolo] params: iou loss: mse, iou_norm: 0.75, cls_norm: 1.00, scale_x_y: 1.00
-Total BFLOPS 5.448 
- Allocate additional workspace_size = 52.43 MB 
+Total BFLOPS 5.448
+ Allocate additional workspace_size = 52.43 MB
 Loading weights from backup/yolov3-artefact_final.weights...
- seen 64 
+ seen 64
 Done!
 
- try to allocate additional workspace_size = 52.43 MB 
- CUDA allocate done! 
-object names loaded 
+ try to allocate additional workspace_size = 52.43 MB
+ CUDA allocate done!
+object names loaded
 input image or video filename: ZED 3D Camera SUCCESS
 
  Video size: [1280 x 720]
- t_write exit 
- t_network exit 
+ t_write exit
+ t_network exit
+```
+
+Finally, run the python script for extracting artefacts' coordinates. This script is a modified version of [this](https://github.com/stereolabs/zed-yolo/tree/master/zed_python_sample).
+
+```sh
+% python3 darknet_zed.py
 ```
 
 ## 6. Modify + Repeat
 
 `How can you improve it? Log all the experiments (it would be optimal to create new files for bigger changes like using a completely different model) and using comments and editing changes in the same file for smaller changes.`
 
-`Why did you chose to modify what? Quality of answer is important.`
+`Why did you choose to modify what? Quality of answer is important.`
+
+Throughout the data preparation and the training process, there are mainly three improvements that I have made.
+
+### Dataset
+
+In the first few trials, the model only detected the artefact when holding it with a hand. This was an overfitting problem due to the biased dataset (almost all the training image included my hand holding the artefact). I then added other images withou my hand to the dataset and solved the problem.
+
+The overfitting model is here: 
+
+### Model configuration
+
+Initially I started from `yolov3-tiny.cfg` in 
+
+### Iteration
+
+The darknet documentation suggests that 
 
 ## Author
 
-Iori Mizutani - University of St. Gallen 
+Iori Mizutani - University of St. Gallen
