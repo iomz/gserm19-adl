@@ -89,7 +89,7 @@ The below is the visualization of the resulting model using [Netron](https://git
 
 ## 4. Train
 
-As defined in the model configuration file from the previous step, I have trained the model for 35020 iterations with the learning rate adjustment after 15000 and 29000 batches. The below is the plot of the average loss throughout the iterations.
+As defined in the model configuration file from the previous step, I have trained the model for 35020 iterations with the learning rate adjustment after 15000 and 29000 batches. The below is the plot of the average loss throughout the iterations. The final training took almost 3 hours in total.
 
 ![Average loss over iterations](https://i.imgur.com/cCqRsNm.png)
 
@@ -178,15 +178,15 @@ Throughout the data preparation and the training process, there are mainly three
 
 In the first few trials, the model only detected the artefact when holding it with a hand. This was an overfitting problem due to the biased dataset (almost all the training image included my hand holding the artefact). I then added other images withou my hand to the dataset and solved the problem.
 
-The overfitting model is here: 
+An example overfitting model is here: https://github.com/iomz/gserm19-adl/releases/download/v1/yolov3-artefact-overfitting.weights
 
 ### Model configuration
 
-Initially I started from `yolov3-tiny.cfg` in 
+Initially I started from `yolov3-tiny.cfg` from https://github.com/AlexeyAB/darknet/blob/master/cfg/yolov3-tiny.cfg, but it took long time to train the model with the yolov3-tiny pretrained model and often resulted in underfitting (false-positive detection). So I changed the base model to the darknet53, which is a pretrained convolutional model seemingly suitable for single object detection. In the 3 convolutional layers, I modified the number of filters to match the number of classes (in this case, 1) acccording to the "filters=(classes + 5)x3" rule from [here](https://github.com/AlexeyAB/darknet#how-to-train-to-detect-your-custom-objects).
 
-### Iteration
+### Learning rate decay
 
-The darknet documentation suggests that 
+Finally, to maximize the performance gain from increasing iterations, I configured the model to decrease the learning rate after 15000 and 29000 iterations.
 
 ## Author
 
